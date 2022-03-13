@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="my.edu.utar.passwordmanager">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher1"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher1"
+        android:supportsRtl="true"
+
+        android:theme="@style/Theme.PasswordManager">
+        <activity
+            android:name=".RevealPassword"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+        <activity
+            android:name=".SignInPassword"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+        <activity
+            android:name=".siginDialogBox"
+            android:exported="false"
+            tools:ignore="Instantiatable" />
+        <activity
+            android:name=".AddNewPassword"
+            android:exported="false" />
+        <activity
+            android:name=".PasswordMangerMainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
