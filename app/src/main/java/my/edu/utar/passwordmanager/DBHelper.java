@@ -58,10 +58,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         "password VARCHAR(255) NOT NULL, FOREIGN KEY(userID) REFERENCES User(id));");
     }
 
-
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO Auto-generated method stub
         db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS Password");
         onCreate(db);
@@ -85,15 +83,13 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
-
     @SuppressLint("Range")
     public int checkUserPassword(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select id , password from User where username = '" + username + "'", null);
         if (res.moveToFirst()) {
-            //Check is equal to input password
+            // Check is equal to input password
             String hashedPassword = res.getString(res.getColumnIndex("password"));
-            System.out.println(hashedPassword);
             BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hashedPassword);
             System.out.println(result.verified == true);
             if (result.verified == true) {
@@ -107,10 +103,12 @@ public class DBHelper extends SQLiteOpenHelper {
     @SuppressLint("Range")
     public boolean checkUserPasswordwithUserId(String username, String password, String userID) {
         SQLiteDatabase db = this.getReadableDatabase();
-        /* Cursor res = db.rawQuery("select id , password from User " +
-                "where username = '" + username + "' " +
-                "and id = " + userID + " and password = '"
-                + password + "'", null); */
+        /*
+         * Cursor res = db.rawQuery("select id , password from User " +
+         * "where username = '" + username + "' " +
+         * "and id = " + userID + " and password = '"
+         * + password + "'", null);
+         */
         Cursor res = db.rawQuery("select id , password from User " +
                 "where username = '" + username + "' " +
                 "and id = " + userID + "", null);
@@ -118,8 +116,8 @@ public class DBHelper extends SQLiteOpenHelper {
             String hashedPassword = res.getString(res.getColumnIndex("password"));
             System.out.println(hashedPassword);
             BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hashedPassword);
-            if (result.verified == true){
-                //Check is equal to input password
+            if (result.verified == true) {
+                // Check is equal to input password
                 return true;
             }
             return false;
@@ -129,18 +127,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @SuppressLint("Range")
     public boolean insertNewPassword(String userID, String siteName, String username, String password) {
-        //TODO encrypt password
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor userInfo = db.rawQuery("select password from User where id = " + userID, null);
         String encryptionPassword = null;
         if (userInfo.moveToFirst()) {
-            //Check is equal to input password
             encryptionPassword = userInfo.getString(userInfo.getColumnIndex("password"));
         }
-        try{
+        try {
             // Encrypt password
             password = encrypt(password, encryptionPassword);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getStackTrace());
             return false;
         }
@@ -167,21 +163,24 @@ public class DBHelper extends SQLiteOpenHelper {
     @SuppressLint("Range")
     public HashMap getPassword(String passwordID) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select u.password as encryptionPassword,p.password as password, p.siteName as siteName, p.username as username " +
-                "from Password p inner join User u on p.userID = u.id" +
-                " where p.id = " + passwordID + ";", null);
+        Cursor res = db.rawQuery(
+                "select u.password as encryptionPassword,p.password as password, p.siteName as siteName, p.username as username "
+                        +
+                        "from Password p inner join User u on p.userID = u.id" +
+                        " where p.id = " + passwordID + ";",
+                null);
         String siteName, username, password, encryptedPass, oriPassword;
         siteName = username = password = encryptedPass = oriPassword = null;
-        if (res.moveToFirst()){
+        if (res.moveToFirst()) {
             siteName = res.getString(res.getColumnIndex("siteName"));
             username = res.getString(res.getColumnIndex("username"));
             password = res.getString(res.getColumnIndex("password"));
             encryptedPass = res.getString(res.getColumnIndex("encryptionPassword"));
         }
         System.out.println(password);
-        try{
-            oriPassword = decrypt(password,encryptedPass);
-        }catch (Exception e){
+        try {
+            oriPassword = decrypt(password, encryptedPass);
+        } catch (Exception e) {
             System.out.println(e.getStackTrace());
         }
         HashMap<String, String> resVal = new HashMap<String, String>();
@@ -197,13 +196,13 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor userInfo = db.rawQuery("select password from User where id = " + userID, null);
         String encryptionPassword = null;
         if (userInfo.moveToFirst()) {
-            //Check is equal to input password
+            // Check is equal to input password
             encryptionPassword = userInfo.getString(userInfo.getColumnIndex("password"));
         }
-        try{
+        try {
             // Encrypt password
             password = encrypt(password, encryptionPassword);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getStackTrace());
             return false;
         }
@@ -229,7 +228,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Encrypt decrypt test
-    private String encrypt (String passwordToEncrypt, String password) throws Exception {
+    private String encrypt(String passwordToEncrypt, String password) throws Exception {
         SecretKeySpec key = generateKey(password);
         Cipher c = Cipher.getInstance("AES");
         c.init(Cipher.ENCRYPT_MODE, key);
@@ -238,7 +237,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return encryptedVal;
     }
 
-    private String decrypt (String cipherTxt, String password) throws Exception{
+    private String decrypt(String cipherTxt, String password) throws Exception {
         SecretKeySpec key = generateKey(password);
         Cipher c = Cipher.getInstance("AES");
         c.init(Cipher.DECRYPT_MODE, key);
@@ -248,7 +247,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return decryptedValStr;
     }
 
-    private SecretKeySpec generateKey (String password) throws Exception{
+    private SecretKeySpec generateKey(String password) throws Exception {
         final MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] bytes = password.getBytes("UTF-8");
         digest.update(bytes, 0, bytes.length);
